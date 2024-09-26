@@ -8,12 +8,16 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'analize',
     pathMatch: 'full'
   },
   {
-    path: 'inference',
-    loadChildren: () => import('./inference/inference.module').then( m => m.InferencePageModule)
+    path: 'contact',
+    loadChildren: () => import('./contact/contact.module').then( m => m.ContactPageModule)
+  },
+  {
+    path: 'analize',
+    loadChildren: () => import('./analize/analize.module').then( m => m.AnalizePageModule)
   },
 ];
 

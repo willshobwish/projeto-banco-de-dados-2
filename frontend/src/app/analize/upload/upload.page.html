@@ -1,0 +1,20 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Upload de imagem</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Upload de imagem</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <form [formGroup]="fileUploadForm" (ngSubmit)="onSubmit()">
+    <ion-item>
+      <!-- <ion-label position="floating">Upload File</ion-label> -->
+      <input type="file" (change)="onFileChange($event)" accept=".png, .jpg, .jpeg, .pdf" />
+    </ion-item>
+    <ion-button expand="full" type="submit" [disabled]="!fileUploadForm.valid">Upload</ion-button>
+  </form>
+</ion-content>
