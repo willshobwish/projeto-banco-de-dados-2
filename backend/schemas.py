@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class UserBase(BaseModel):
     email: str
@@ -9,7 +10,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
-    image_filename: str | None = None
+    image_filename: Optional[str] = None
 
     class Config:
         orm_mode = True
