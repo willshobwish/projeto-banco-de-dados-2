@@ -16,12 +16,12 @@ export class SigninPage implements OnInit {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-    }
-  }
+  // onFileSelected(event: Event) {
+  //   const input = event.target as HTMLInputElement;
+  //   if (input.files && input.files.length > 0) {
+  //     this.selectedFile = input.files[0];
+  //   }
+  // }
 
   onRegister() {
     if (this.password !== this.confirmPassword) {
@@ -30,7 +30,7 @@ export class SigninPage implements OnInit {
     }
 
     this.authService
-      .registerUser(this.email, this.password, this.name, this.selectedFile)
+      .registerUser(this.email, this.password, this.name)
       .subscribe({
         next: (response) => {
           this.router.navigate(['/tabs/user']); // Redirect to user page after registration
