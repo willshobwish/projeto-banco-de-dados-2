@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from 'src/guard/auth.guard';
 
 const routes: Routes = [
   {
@@ -8,30 +9,33 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
-        loadChildren: () => import('../tab1/tab1.module').then(m => m.Tab1PageModule)
+        path: 'report',
+        loadChildren: () => import('../report/report.module').then(m => m.ReportPageModule),
+        canActivate:[AuthGuard]
       },
       {
-        path: 'tab2',
-        loadChildren: () => import('../tab2/tab2.module').then(m => m.Tab2PageModule)
+        path: 'user',
+        loadChildren: () => import('../user/user.module').then(m => m.UserPageModule)
       },
       {
-        path: 'tab3',
-        loadChildren: () => import('../tab3/tab3.module').then(m => m.Tab3PageModule)
-      },      {
+        path: 'upload',
+        loadChildren: () => import('../upload/upload.module').then(m => m.UploadPageModule),
+        canActivate:[AuthGuard]
+      },
+      {
         path: 'about',
         loadChildren: () => import('../about/about.module').then(m => m.AboutPageModule)
       },
       {
         path: '',
-        redirectTo: '/tabs/tab1',
+        redirectTo: '/tabs/user',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/tabs/user',
     pathMatch: 'full'
   }
 ];
