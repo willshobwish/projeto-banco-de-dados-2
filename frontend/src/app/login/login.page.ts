@@ -1,24 +1,40 @@
-import { Component } from '@angular/core';
-import { AuthService } from 'src/services/auth.service';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ApiService } from '../services/api.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage {
-  email: string = '';
-  password: string = '';
+export class LoginPage implements OnInit {
 
-  constructor(public authService: AuthService, private router: Router) {}
+  email = '';
+  password = '';
+
+  constructor(private apiService: ApiService, private alertController: AlertController) {}
 
   async login() {
     try {
-      await this.authService.login(this.email, this.password);
-      this.router.navigate(['/tabs']);
+      const result = await this.apiService.login(this.email, this.password);
+      const alert = await this.alertController.create({
+        header: 'Login Successful',
+        message: `Welcome ${result.fullName}!`,
+        buttons: ['OK'],
+      });
+      await alert.present();
+      // Redirect to the main page or dashboard after successful login
     } catch (error) {
-      console.log('Login failed', error);
+      const alert = await this.alertController.create({
+        header: 'Login Failed',
+        message: 'Incorrect email or password.',
+        buttons: ['OK'],
+      });
+      await alert.present();
     }
   }
+
+  ngOnInit() {
+  }
+
 }

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
-import { AuthGuard } from 'src/guard/auth.guard';
 
 const routes: Routes = [
   {
@@ -9,26 +8,20 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'report',
-        loadChildren: () => import('../report/report.module').then(m => m.ReportPageModule),
-        canActivate:[AuthGuard]
+        path: 'upload',
+        loadChildren: () => import('../upload/upload.module').then(m => m.UploadPageModule)
       },
       {
         path: 'user',
         loadChildren: () => import('../user/user.module').then(m => m.UserPageModule)
       },
       {
-        path: 'upload',
-        loadChildren: () => import('../upload/upload.module').then(m => m.UploadPageModule),
-        canActivate:[AuthGuard]
-      },
-      {
-        path: 'about',
-        loadChildren: () => import('../about/about.module').then(m => m.AboutPageModule)
+        path: 'report',
+        loadChildren: () => import('../report/report.module').then(m => m.ReportPageModule)
       },
       {
         path: '',
-        redirectTo: '/tabs/user',
+        redirectTo: 'user',
         pathMatch: 'full'
       }
     ]
