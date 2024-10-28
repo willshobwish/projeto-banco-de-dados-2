@@ -1,9 +1,3 @@
-# CPU 
-pip install fastapi sqlalchemy uvicorn pydantic passlib python-multipart python-dotenv torch torchvision torchaudio ultralytics
+pip install PyJWT
 
-# GPU
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-pip install fastapi sqlalchemy uvicorn pydantic passlib python-multipart python-dotenv ultralytics
-
-# Backend initialization
-uvicorn app.main:app --reload
+uvicorn backend.main:app --reload
