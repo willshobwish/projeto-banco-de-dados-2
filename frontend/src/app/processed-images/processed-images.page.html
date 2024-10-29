@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Processed images</ion-title>
+    <ion-buttons slot="end">
+      <!-- Optional: Add more buttons on the right if needed -->
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Processed images</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-grid>
+    <ion-row class="ion-justify-content-around">
+      <ion-col size="6" *ngFor="let image of processedImages">
+        <ion-card *ngIf="image.file_path">
+          <ion-grid>
+            <ion-row>
+              <ion-col>
+                <img
+                  [src]="image.filepath_backend"
+                  alt="Processed Image"
+                  style="height: 300px; width: auto"
+              /></ion-col>
+
+              <ion-col>
+                <ion-card-header>
+                  <ion-card-title
+                    >Processed Image {{ image.id }}</ion-card-title
+                  >
+                  <ion-card-subtitle>{{image.description}}</ion-card-subtitle>
+                </ion-card-header>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <div *ngIf="processedImages.length === 0">
+    <p>No processed images available.</p>
+  </div>
+</ion-content>

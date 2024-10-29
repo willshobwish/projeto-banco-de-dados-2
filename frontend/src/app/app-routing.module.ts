@@ -17,6 +17,20 @@ const routes: Routes = [
     loadChildren: () =>
       import('./register/register.module').then((m) => m.RegisterPageModule),
   },
+  {
+    path: 'processed-images',
+    loadChildren: () =>
+      import('./processed-images/processed-images.module').then(
+        (m) => m.ProcessedImagesPageModule
+      ),
+  },
+  {
+    path: 'processed-images/:image_id',
+    loadChildren: () =>
+      import('./processed-images/processed-images.module').then(
+        (m) => m.ProcessedImagesPageModule
+      ),
+  },
 ];
 @NgModule({
   imports: [

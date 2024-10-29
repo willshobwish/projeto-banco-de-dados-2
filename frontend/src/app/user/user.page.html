@@ -1,6 +1,15 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>user</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="userData" (click)="logout()"><ion-icon name="exit-outline"></ion-icon> Logout</ion-button>
+      <!-- <ion-button routerLink="/">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-button> -->
+    </ion-buttons>
+    <ion-title>Usuário</ion-title>
+    <ion-buttons slot="end">
+      <!-- Optional: Add more buttons on the right if needed -->
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -10,6 +19,22 @@
       <ion-title size="large">user</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-button [routerLink]="['/login']">Login</ion-button>
-  <ion-button [routerLink]="['/register']">Register</ion-button>
-</ion-content>
+  
+  <ion-content *ngIf="userData">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title
+          >Welcome, {{ userData.full_name || 'User' }}!</ion-card-title
+        >
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Email:</strong> {{ userData.email }}</p>
+        <p><strong>Full Name:</strong> {{ userData.full_name }}</p>
+      </ion-card-content>
+    </ion-card>
+  </ion-content>
+
+  <ion-content *ngIf="!userData">
+    <p>Loading...</p>
+  </ion-content></ion-content
+>

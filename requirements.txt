@@ -1,3 +1,0 @@
-pip install PyJWT
-
-uvicorn backend.main:app --reload

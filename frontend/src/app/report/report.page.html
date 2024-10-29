@@ -1,13 +1,77 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>report</ion-title>
+    <ion-title>Report</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">report</ion-title>
+      <ion-title size="large">Report</ion-title>
     </ion-toolbar>
   </ion-header>
+  <div *ngIf="userImages.length > 0">
+    <ion-grid>
+      <ion-row class="ion-justify-content-around">
+        <ion-col size="6" *ngFor="let image of userImages">
+          <ion-card>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <img
+                    [src]="image.file_path"
+                    alt="User Image"
+                    style="width: auto; height: 300px"
+                  />
+                </ion-col>
+                <ion-col>
+                  <ion-card-header>
+                    <ion-card-title>{{image.filename}}</ion-card-title>
+                    <ion-card-subtitle
+                      >Criado em: {{image.created_at}}</ion-card-subtitle
+                    >
+                    <ion-card-subtitle
+                      >modificado em: {{image.updated_at}}</ion-card-subtitle
+                    >
+                  </ion-card-header>
+                  <ion-card-content>
+                    <ion-buttons>
+                      <ion-button
+                        *ngIf="!image.is_processed"
+                        (click)="processImage(image.id)"
+                        [disabled]="image.is_processed"
+                        [class.disabled-button]="image.is_processed"
+                        fill="solid"
+                        expand="block"
+                        >Processar</ion-button
+                      >
+                      <ion-button
+                        fill="solid"
+                        expand="block"
+                        (click)="deleteImage(image.id)"
+                      >
+                        <ion-icon name="trash-outline"></ion-icon>
+                      </ion-button>
+                      <ion-button
+                        fill="solid"
+                        expand="block"
+                        [routerLink]="['/processed-images', image.id]"
+                      >
+                        <ion-icon name="eye-outline"></ion-icon>
+                        View Processed Images
+                      </ion-button>
+                    </ion-buttons>
+                  </ion-card-content>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div *ngIf="userImages.length === 0">
+    <p>No images uploaded.</p>
+  </div>
 </ion-content>

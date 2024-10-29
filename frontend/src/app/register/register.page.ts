@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../services/api.service';
 import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -11,11 +12,12 @@ export class RegisterPage implements OnInit {
   email = '';
   fullName = '';
   password = '';
-  role = 'user';
+  // role = 'user';
 
   constructor(
     private apiService: ApiService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private router:Router
   ) {}
 
   async register() {
@@ -24,7 +26,7 @@ export class RegisterPage implements OnInit {
         this.email,
         this.fullName,
         this.password,
-        this.role
+        
       );
       const alert = await this.alertController.create({
         header: 'Registration Successful',
@@ -32,6 +34,7 @@ export class RegisterPage implements OnInit {
         buttons: ['OK'],
       });
       await alert.present();
+      this.router.navigate(['/login'])
     } catch (error) {
       const alert = await this.alertController.create({
         header: 'Registration Failed',

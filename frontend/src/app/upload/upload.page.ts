@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ImageUploadService, UploadResponse } from '../services/image.service';
 import { AlertController } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
+import { ApiService } from '../services/api.service';
 
 @Component({
   selector: 'app-upload',
@@ -12,47 +11,38 @@ export class UploadPage implements OnInit {
   selectedFile: File | null = null;
 
   constructor(
-    private imageUploadService: ImageUploadService,
+    private apiService: ApiService,
     private alertController: AlertController
   ) {}
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      this.selectedFile = input.files[0];
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+    this.selectedFile = file;
+  }
+
+  async uploadImage(event: Event) {
+    event.preventDefault();
+    if (!this.selectedFile) {
+      return;
+    }
+
+    try {
+      const result = await this.apiService.uploadImage(this.selectedFile);
+      const alert = await this.alertController.create({
+        header: 'Upload Successful',
+        message: 'Your image was uploaded successfully!',
+        buttons: ['OK'],
+      });
+      await alert.present();
+    } catch (error) {
+      const alert = await this.alertController.create({
+        header: 'Upload Failed',
+        message: 'Could not upload the image. Please try again.',
+        buttons: ['OK'],
+      });
+      await alert.present();
     }
   }
 
-  async uploadImage() {
-    if (this.selectedFile) {
-      try {
-        // Use firstValueFrom and assert that the result is not undefined
-        const result = await firstValueFrom(this.imageUploadService.uploadImage(this.selectedFile));
-        if (result) { // Check if result is defined
-          const alert = await this.alertController.create({
-            header: 'Upload Successful',
-            message: `Image uploaded as ${result.filename}`,
-            buttons: ['OK'],
-          });
-          await alert.present();
-        } else {
-          // Handle the case where result is undefined
-          const alert = await this.alertController.create({
-            header: 'Upload Failed',
-            message: 'Image upload returned no result.',
-            buttons: ['OK'],
-          });
-          await alert.present();
-        }
-      } catch (error) {
-        const alert = await this.alertController.create({
-          header: 'Upload Failed',
-          message: 'Could not upload image. Try again later.',
-          buttons: ['OK'],
-        });
-        await alert.present();
-      }
-    }
-  }
   ngOnInit() {}
 }

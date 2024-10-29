@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabsPage } from './tabs.page';
+import { AuthGuard } from '../services/auth.guard';
 
 const routes: Routes = [
   {
@@ -9,28 +10,34 @@ const routes: Routes = [
     children: [
       {
         path: 'upload',
-        loadChildren: () => import('../upload/upload.module').then(m => m.UploadPageModule)
+        loadChildren: () =>
+          import('../upload/upload.module').then((m) => m.UploadPageModule),
+        canActivate: [AuthGuard],
       },
       {
         path: 'user',
-        loadChildren: () => import('../user/user.module').then(m => m.UserPageModule)
+        loadChildren: () =>
+          import('../user/user.module').then((m) => m.UserPageModule),
+        canActivate: [AuthGuard],
       },
       {
         path: 'report',
-        loadChildren: () => import('../report/report.module').then(m => m.ReportPageModule)
+        loadChildren: () =>
+          import('../report/report.module').then((m) => m.ReportPageModule),
+        canActivate: [AuthGuard],
       },
       {
         path: '',
-        redirectTo: 'user',
-        pathMatch: 'full'
-      }
-    ]
+        redirectTo: 'report',
+        pathMatch: 'full',
+      },
+    ],
   },
   {
     path: '',
-    redirectTo: '/tabs/user',
-    pathMatch: 'full'
-  }
+    redirectTo: '/tabs/report',
+    pathMatch: 'full',
+  },
 ];
 
 @NgModule({
