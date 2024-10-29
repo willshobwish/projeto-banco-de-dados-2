@@ -1,0 +1,1 @@
+start cmd /k "conda activate projetobd && uvicorn backend.main:app"
