@@ -22,7 +22,7 @@ class Image(Base):
     created_at = Column(DateTime, default=func.now(), nullable=False)
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
     owner = relationship("User", back_populates="images")
-    processed_images = relationship("ProcessedImage", back_populates="original_image")
+    processed_images = relationship("ProcessedImage", back_populates="original_image",cascade="all, delete-orphan")
     
 class ProcessedImage(Base):
     __tablename__ = "processed_images"

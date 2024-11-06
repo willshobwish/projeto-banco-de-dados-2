@@ -149,10 +149,14 @@ async def delete_image_route(
         )
     db_image = db.execute(select(Image).filter(
         Image.id == image_id)).scalars().first()
+    for i in db_image.processed_images:
+        os.remove(i.file_path)
+    # os.removedirs(os.path.split(i.file_path))
+    os.remove(db_image.file_path)
     if db_image:
         db.delete(db_image)
         db.commit()
-        os.remove(db_image.file_path)
+        # os.remove(db_image.file_path)
         return db_image
     if db_image is None or db_image.owner_id != current_user.id:
         raise HTTPException(

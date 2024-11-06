@@ -26,8 +26,8 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-os.makedirs(r'backend\processed')
-os.makedirs(r'backend\upload')
+os.makedirs(r'backend\processed',exist_ok=True)
+os.makedirs(r'backend\upload',exist_ok=True)
 
 app.mount("/files", StaticFiles(directory="backend/upload"), name="files")
 app.mount("/processed-images", StaticFiles(directory="backend/processed"), name="processed")
