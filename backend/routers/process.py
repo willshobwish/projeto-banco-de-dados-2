@@ -11,7 +11,6 @@ from ..models import Image as ImageDB
 from ..dependencies import get_db, get_current_user
 from fastapi.responses import JSONResponse
 from sqlalchemy.future import select
-from ..schemas import ProcessedImagesResponse
 
 router = APIRouter()
 UPLOAD_DIR = r"backend\processed"
@@ -23,80 +22,101 @@ model_yolo = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).to
 
 @router.post("/{image_id}")
 async def process_image(image_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    query = db.execute(select(ImageDB).where(ImageDB.id == image_id))
-    image_database = query.scalar_one_or_none()
-    
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
+
+    cursor = db.cursor(dictionary=True)
+
+    # Query to fetch the image from the database
+    cursor.execute("""
+        SELECT * FROM images WHERE id = %s
+    """, (image_id,))
+    image_database = cursor.fetchone()
 
     if not image_database:
         raise HTTPException(status_code=404, detail="Image not found")
 
     try:
-        img = cv2.imread(image_database.file_path)
+        # Read and process the image with OpenCV
+        img = cv2.imread(image_database["file_path"])
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         results = model_yolo(img_rgb)
         boxes = results.xyxy[0]
         boxes = boxes.cpu().numpy() if device == 'cuda' else boxes.numpy()
-        os.makedirs(os.path.join(UPLOAD_DIR, str(current_user.id)), exist_ok=True)
+
+        os.makedirs(os.path.join("backend/upload", str(current_user["id"])), exist_ok=True)
 
         for i, box in enumerate(boxes):
             x1, y1, x2, y2, conf, cls = box.astype(int)
-            segment = img[y1:y2, x1:x2]  
+            segment = img[y1:y2, x1:x2]
 
-            segment_filename = f"{os.path.splitext(os.path.basename(image_database.file_path))[0]}_segment_{i}.png"
-            segment_path = os.path.join(UPLOAD_DIR, str(current_user.id), segment_filename)
+            segment_filename = f"{os.path.splitext(os.path.basename(image_database['file_path']))[0]}_segment_{i}.png"
+            segment_path = os.path.join("backend/upload", str(current_user["id"]), segment_filename)
             cv2.imwrite(segment_path, segment)
 
             # Generate captions for the segment
             raw_image = Image.open(segment_path).convert('RGB')
-            inputs = processor(raw_image, return_tensors="pt",
-                                           max_length=80,           
-                                            num_beams=7,    
-                                            temperature=0.9,        
-                                            top_k=80,                
-                                            top_p=0.95,             
-                                            repetition_penalty=2.0,   
-                                            num_return_sequences=3).to(device)
+            inputs = processor(raw_image, return_tensors="pt", max_length=80, num_beams=7, temperature=0.9, top_k=80, top_p=0.95, repetition_penalty=2.0, num_return_sequences=3).to(device)
             out = model.generate(**inputs)
-
             caption = processor.decode(out[0], skip_special_tokens=True)
 
+            # Insert processed image into the database
+            cursor.execute("""
+                INSERT INTO processed_images (file_path, original_image_id, description)
+                VALUES (%s, %s, %s)
+            """, (segment_path, image_database["id"], caption))
+            db.commit()
 
-            processed_image_db = ProcessedImage(
-                file_path=segment_path,
-                original_image_id=image_database.id,
-                description=caption  
-            )
-            db.add(processed_image_db)
-
-        image_database.is_processed = True
-        db.add(image_database)
+        # Mark the original image as processed
+        cursor.execute("""
+            UPDATE images
+            SET is_processed = TRUE
+            WHERE id = %s
+        """, (image_database["id"],))
         db.commit()
 
-        return JSONResponse(content={"message": "Image processed successfully", "file_path": image_database.file_path})
+        cursor.close()
+        db.close()
+
+        return {"message": "Image processed successfully", "file_path": image_database["file_path"]}
 
     except Exception as e:
+        cursor.close()
+        db.close()
         raise HTTPException(
             status_code=500, detail=f"Failed to process image: {str(e)}"
         )
     
-@router.get("/{image_id}", response_model=list[ProcessedImagesResponse])
-async def getProcessedImages(image_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    query = db.execute(select(ProcessedImage).where(
-        ProcessedImage.original_image_id == image_id))
-    image_database = query.scalars().all()
-
+def get_processed_images(image_id: int, current_user: dict, db: Session = Depends(get_db)):
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
-    processed_images = [{"id": image.id,
-                         "file_path": image.file_path,
-                         "original_image_id": image.original_image_id,
-                         "description": image.description,
-                         "created_at": image.created_at,
-                         "filepath_backend": "http://localhost:8000/processed-images"+image.file_path.replace("\\", "/").replace("backend", "").replace("processed", "")} for image in image_database]
+    
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM processed_images 
+        WHERE original_image_id = %s
+    """, (image_id,))
+
+    processed_images_db = cursor.fetchall()
+
+    processed_images = [
+        {
+            "id": image["id"],
+            "file_path": image["file_path"],
+            "original_image_id": image["original_image_id"],
+            "description": image["description"],
+            "created_at": image["created_at"],
+            "filepath_backend": "http://localhost:8000/processed-images" + image["file_path"].replace("\\", "/").replace("backend", "").replace("processed", "")
+        }
+        for image in processed_images_db
+    ]
+
+    cursor.close()
+    db.close()
+
     return processed_images

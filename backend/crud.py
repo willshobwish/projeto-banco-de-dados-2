@@ -1,16 +1,36 @@
 # app/crud.py
-from sqlalchemy.orm import Session
 from .models import User
-from .schemas import UserCreate
 from .utils import hash_password
+from hashlib import sha256
 
-def create_user(db: Session, user: UserCreate):
-    hashed_password = hash_password(user.password)
-    db_user = User(email=user.email, full_name=user.full_name, hashed_password=hashed_password)
-    db.add(db_user)
+
+def hash_password(password: str):
+    return sha256(password.encode('utf-8')).hexdigest()
+
+
+def create_user(db, user):
+    hashed_password = hash_password(user['password'])
+
+
+    cursor = db.cursor()
+    cursor.execute("""
+        INSERT INTO users (email, full_name, hashed_password, created_at, updated_at)
+        VALUES (%s, %s, %s, NOW(), NOW())
+    """, (user['email'], user['full_name'], hashed_password))
+
     db.commit()
-    db.refresh(db_user)
+    user_id = cursor.lastrowid  
+
+
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    db_user = cursor.fetchone()
+
+    cursor.close()
     return db_user
 
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+def get_user_by_email(db, email):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+    db_user = cursor.fetchone()
+    cursor.close()
+    return db_user
