@@ -1,6 +1,6 @@
 # Projeto semestral da disciplina de banco de dados 2
 
-## Frontent
+## Frontend
 
 Frontent desenvolvido utilizando **Angular** com a framekwork **Ionic**
 
