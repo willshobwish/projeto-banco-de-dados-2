@@ -13,7 +13,8 @@ Backend desenvolvido utilizando a linguagem de programação **Python** com
 
 **Pytorch** e **Ultralytics**: são frameworks para suporte de modelos de inteligência artificial
 
-## Modelos de inteligência artificial utilizaram foram:
+## Modelos de inteligência artificial 
+Modelos de inteligência artificial utilizados foram:
 
 [**YOLOv5**](https://pytorch.org/hub/ultralytics_yolov5/): You Only Look Once. Utilizado para segmentação de imagens em classes que o modelo foi treinado.
 
