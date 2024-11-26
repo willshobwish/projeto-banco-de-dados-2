@@ -1,7 +1,7 @@
 # app/main.py
 from fastapi import FastAPI
 from .db import Base, engine
-from .routers import users,upload,process
+from .routers import users,upload,process,search
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import uvicorn
@@ -36,3 +36,4 @@ app.mount("/processed-images", StaticFiles(directory="backend/processed"), name=
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(upload.router,prefix='/upload')
 app.include_router(process.router,prefix="/process")
+app.include_router(search.router,prefix="/search")

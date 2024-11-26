@@ -95,4 +95,17 @@ export class ApiService {
     });
     return response.data;
   }
+
+  async searchImages(query: string): Promise<any[]> {
+    try {
+      const response = await axios.get(`${API_URL}/search`, {
+        headers: this.getAuthHeaders(), // Use the token in headers
+        params: { query },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+      throw error;
+    }
+  }
 }

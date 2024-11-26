@@ -31,6 +31,14 @@ const routes: Routes = [
         (m) => m.ProcessedImagesPageModule
       ),
   },
+  {
+    path: 'search',
+    loadChildren: () => import('./search/search.module').then( m => m.SearchPageModule)
+  },
+  {
+    path: 'image-viewer',
+    loadChildren: () => import('./image-viewer/image-viewer.module').then( m => m.ImageViewerPageModule)
+  },
 ];
 @NgModule({
   imports: [

@@ -27,6 +27,12 @@ const routes: Routes = [
         canActivate: [AuthGuard],
       },
       {
+        path: 'search',
+        loadChildren: () =>
+          import('../search/search.module').then((m) => m.SearchPageModule),
+        canActivate: [AuthGuard],
+      },
+      {
         path: '',
         redirectTo: 'report',
         pathMatch: 'full',
